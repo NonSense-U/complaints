@@ -18,10 +18,9 @@ class OtpService
 
     public function sendOtp(User $user)
     {
-        // $otp = rand(100000, 999999);
+        $otp = rand(100000, 999999);
 
         //! for testing
-        $otp = "123123";
         $this->otpRepo->createForUser($user->id, $otp);
 
         try {
@@ -35,7 +34,7 @@ class OtpService
 
 
         // إرسال الرمز عبر Notification
-        $user->notify(new SendOtpNotification($otp));
+        // $user->notify(new SendOtpNotification($otp));
     }
 
     public function verify(User $user, string $otp)

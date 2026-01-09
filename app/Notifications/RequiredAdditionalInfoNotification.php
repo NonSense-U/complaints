@@ -9,14 +9,17 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class SendNewNoteNotification extends Notification
+class RequiredAdditionalInfoNotification extends Notification
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Complaint $complaint,public string $note) {}
+    public function __construct(public Complaint $complaint, public string $infoNeeded)
+    {
+        //
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -34,9 +37,9 @@ class SendNewNoteNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('تم إضافة ملاحظة جديدة على شكواك')
-            ->line('تم إضافة الملاحظة التالية على شكواك:')
-            ->line($this->note);
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -47,13 +50,11 @@ class SendNewNoteNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'type' => 'new_note_added',
-            'complaint_id' => $this->complaint->id,
-            'reference_number' => $this->complaint->reference_number,
-            'note' => $this->note,
-            'message' => 'تم إضافة ملاحظة جديدة على شكواك',
+            'message' => 'مطلوب معلومات إضافية بخصوص شكواك.',
+            'info_needed' => $this->infoNeeded,
         ];
     }
+
     public function broadcastOn(): PrivateChannel
     {
         return new PrivateChannel('user.' . $this->complaint->user_id);

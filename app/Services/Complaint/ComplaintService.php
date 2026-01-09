@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Complaint;
+use App\Notifications\RequiredAdditionalInfoNotification;
 use App\Notifications\SendNewNoteNotification;
 use App\Notifications\SendOtpNotification;
 
@@ -144,8 +145,7 @@ public function addNote($id, $note, $user)
         'note' => $note,
     ]);
 
-    // $citizen = $complaint->user;
-    // $$citizen->notify(new SendNewNoteNotification($note));
+    $complaint->user->notify(new SendNewNoteNotification($complaint, $note));
 
     return $complaint->load('notes');
 }
@@ -161,6 +161,8 @@ public function requestAdditionalInfo($id, $message, $user)
         'note' => $message,
         'type' => 'request_info' // if your notes table supports this
     ]);
+
+    $complaint->user->notify(new RequiredAdditionalInfoNotification($complaint, $message));
 
 
     return true;
