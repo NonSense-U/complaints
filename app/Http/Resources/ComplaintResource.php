@@ -19,13 +19,7 @@ class ComplaintResource extends JsonResource
             'status' => $this->status,
             'notes' => $this->notes,
             'gov_name' => $this->gov ? $this->gov->name : null,
-            'media' => $this->media->map(function ($m) {
-                return [
-                    'media_type' => $m->media_type,
-                    'original_name' => $m->original_name,
-                    'url' => Storage::url($m->file_path),
-                ];
-            })
+            'media' => MediaResource::collection($this->whenLoaded('media')),
         ];
     }
 }

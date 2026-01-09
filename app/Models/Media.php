@@ -13,7 +13,8 @@ class Media extends Model
         'original_name',
         'mime_type',
         'size',
-        'media_type'
+        'media_type',
+        'public_id'
     ];
 
         public function complaint()

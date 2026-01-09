@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('original_name')->nullable();
             $table->string('mime_type')->nullable();
             $table->bigInteger('size')->nullable();
-
+            $table->string('public_id')->nullable();
             $table->enum('media_type', ['image','document']);
 
             $table->timestamps();

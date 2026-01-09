@@ -2,6 +2,7 @@
 
 namespace App\Services\Complaint;
 
+use App\Jobs\UploadComplaintMediaSet;
 use App\Models\Media;
 use App\Repositories\ComplaintRepository;
 use Illuminate\Support\Facades\DB;
@@ -33,19 +34,24 @@ class ComplaintService
             // Create the complaint with all data including reference_number
             $complaint = $this->repo->create($complaintData);
 
-            // حفظ الصور
-            foreach ($images as $img) {
-                $path = $img->store("complaints/{$complaint->id}", 'public');
 
-                Media::create([
-                    'complaint_id' => $complaint->id,
-                    'file_path' => $path, //تعديل جديد
-                    'original_name' => $img->getClientOriginalName(),
-                    'mime_type' => $img->getMimeType(),
-                    'size' => $img->getSize(),
-                    'media_type' => 'image'
-                ]);
+        if (!empty($images)) {
+            $mediaFiles = [];
+
+            foreach ($images as $file) {
+                $path = $file->store('temp'); // stores in storage/app/temp
+
+                $mediaFiles[] = [
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                ];
             }
+
+            UploadComplaintMediaSet::dispatch($complaint, $mediaFiles, 'Complaint Images');
+        }
+
 
             // حفظ المستندات
             foreach ($documents as $doc) {
